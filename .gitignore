@@ -1,0 +1,24 @@
+# Ambiente virtual
+env/
+venv/
+ENV/
+
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Configurações do VSCode (opcional)
+.vscode/
+
+# Arquivos do sistema
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Migrations (se quiser ignorar elas inicialmente)
+**/migrations/*.py
+!**/migrations/__init__.py
