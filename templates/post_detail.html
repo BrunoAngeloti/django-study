@@ -1,0 +1,196 @@
+{% extends 'main.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block head %}
+  <style>
+    body {
+      background-color: #111827;
+      color: #f9fafb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .post-container {
+      background-color: #1f2937;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .post-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #f3f4f6;
+    }
+
+    .post-meta {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+
+    .like-button {
+      background-color: #2563eb;
+      color: #f9fafb;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 30px;
+      transition: background-color 0.2s ease;
+    }
+
+    .like-button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .post-content {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: #e5e7eb;
+      margin-bottom: 40px;
+    }
+
+    .comments-section {
+      border-top: 1px solid #374151;
+      padding-top: 30px;
+    }
+
+    .comments-section h3 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #f3f4f6;
+    }
+
+    .comment {
+      background-color: #374151;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #facc15;
+      margin-bottom: 4px;
+    }
+
+    .comment-content {
+      font-size: 0.95rem;
+      color: #e5e7eb;
+    }
+
+    .comment-date {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 5px;
+    }
+
+    .edit-button {
+      background-color: #f59e0b;
+      color: #111827;
+      padding: 8px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .edit-button:hover {
+      background-color: #d97706;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="post-container">
+
+    {% if request.user == post.author %}
+      <div style="text-align: right; margin-bottom: 10px;">
+        <a href="{% url 'update_post' post.pk %}" class="edit-button" title="Editar post">✏️ Editar</a>
+      </div>
+    {% endif %}
+
+    <div class="post-title">{{ post.title }}</div>
+    
+    <div class="post-meta">
+      Por <strong>{{ post.author.username }}</strong> em {{ post.created_at|date:"d/m/Y H:i" }}
+    </div>
+
+    <form method="post" action="#">
+      {% csrf_token %}
+      <button class="like-button">❤️ Curtir</button>
+    </form>
+
+    <div class="post-content">
+      {{ post.content|linebreaks }}
+    </div>
+
+    <div class="comments-section">
+      <h3>Comentários</h3>
+
+      <!-- Comentários mockados -->
+      <div class="comment">
+        <div class="comment-author">Maria Luíza</div>
+        <div class="comment-content">Achei esse post super útil! Obrigada por compartilhar.</div>
+        <div class="comment-date">20/07/2025 às 14:03</div>
+      </div>
+
+      <div class="comment">
+        <div class="comment-author">João Pedro</div>
+        <div class="comment-content">Excelente explicação. Já implementei no meu projeto!</div>
+        <div class="comment-date">19/07/2025 às 09:47</div>
+      </div>
+
+      <div class="comment">
+        <div class="comment-author">Ana Costa</div>
+        <div class="comment-content">Ficou alguma dúvida, mas vou reler com calma.</div>
+        <div class="comment-date">18/07/2025 às 21:15</div>
+      </div>
+
+      <!-- Formulário para novo comentário -->
+      <form method="post" action="#" style="margin-top: 30px;">
+        {% csrf_token %}
+        <label for="new_comment" style="font-size: 0.9rem; color: #d1d5db; display: block; margin-bottom: 6px;">
+          Deixe um comentário
+        </label>
+        <textarea id="new_comment" name="comment" rows="3" placeholder="Digite seu comentário..."
+          style="
+            width: 97.5%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: #374151;
+            color: #f9fafb;
+            resize: vertical;
+            margin-bottom: 12px;
+          " required></textarea>
+
+        <button type="submit"
+          style="
+            padding: 10px 18px;
+            background-color: #10b981;
+            color: #f9fafb;
+            font-weight: 600;
+            border: none;
+            margin-left: auto;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+          ">
+          Enviar comentário
+        </button>
+      </form>
+    </div>
+
+  </div>
+{% endblock %}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Eticode{% endblock %}</title>
+  {% block head %}{% endblock %}
+  <style>
+    .messages {
+      list-style: none;
+      margin: 20px auto;
+      padding: 0;
+      max-width: 600px;
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    .messages li {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Erro = vermelho */
+    .messages li.error {
+      background-color: #dc2626;
+      color: #fef2f2;
+    }
+
+    /* Sucesso = verde */
+    .messages li.success {
+      background-color: #16a34a;
+      color: #ecfdf5;
+    }
+
+    /* Info, warning (opcional) */
+    .messages li.info {
+      background-color: #2563eb;
+      color: #e0f2fe;
+    }
+    .messages li.warning {
+      background-color: #d97706;
+      color: #fef3c7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Flash messages globais -->
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% block body %}{% endblock %}
+
+  <script>
+    setTimeout(() => {
+      const messages = document.querySelectorAll('.messages li');
+      messages.forEach(msg => {
+        msg.style.transition = 'opacity 0.5s ease';
+        msg.style.opacity = '0';
+        setTimeout(() => msg.remove(), 500); // remove do DOM após fade-out
+      });
+    }, 3000);
+  </script>
+
+</body>
+</html>

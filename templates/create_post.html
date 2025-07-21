@@ -1,0 +1,103 @@
+{% extends 'main.html' %}
+
+{% block title %}Criar post{% endblock %}
+
+{% block head %}
+  <style>
+    body {
+      background-color: #111827;
+      color: #f9fafb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .post-form-container {
+      background-color: #1f2937;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .post-form-container h2 {
+      font-size: 1.8rem;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #f3f4f6;
+    }
+
+    form label {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    form input[type="text"],
+    form textarea {
+      width: 96.5%;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      background-color: #374151;
+      color: #f9fafb;
+      margin-bottom: 20px;
+    }
+
+    form textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    form input:focus,
+    form textarea:focus {
+      outline: 2px solid #2563eb;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #1d4ed8;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div class="post-form-container">
+    <h2>{% if type == 'create' %}Criar novo post{% else %}Editar post{% endif %}</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <label for="{{ form.title.id_for_label }}">Título</label>
+      {{ form.title }}
+
+      <label for="{{ form.content.id_for_label }}">Conteúdo</label>
+      {{ form.content }}
+
+      {% for field in form %}
+        {% for error in field.errors %}
+          <p style="color: #f87171; font-size: 0.9rem;">{{ error }}</p>
+        {% endfor %}
+      {% endfor %}
+
+      <button type="submit">
+        {% if type == 'create' %}Criar post{% else %}Salvar alterações{% endif %}
+    </form>
+  </div>
+{% endblock %}

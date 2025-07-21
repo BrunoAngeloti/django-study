@@ -1,0 +1,144 @@
+{% extends 'main.html' %}
+
+{% block title %}
+  {% if page == 'login' %}Entrar{% else %}Criar conta{% endif %}
+{% endblock %}
+
+{% block head %}
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #111827;
+      color: #f9fafb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .auth-container {
+      background-color: #1f2937;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .auth-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+      color: #f3f4f6;
+    }
+
+    .auth-container form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .auth-container label {
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      color: #d1d5db;
+    }
+
+    .auth-container input {
+      padding: 10px;
+      margin-bottom: 18px;
+      border: none;
+      border-radius: 6px;
+      background-color: #374151;
+      color: #f9fafb;
+    }
+
+    .auth-container input:focus {
+      outline: 2px solid #2563eb;
+    }
+
+    .auth-container button {
+      padding: 12px;
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .auth-container button:hover {
+      background-color: #1d4ed8;
+    }
+
+    .auth-container .switch-link {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+    }
+
+    .auth-container .switch-link a {
+      color: #10b981;
+      text-decoration: none;
+    }
+
+    .auth-container .switch-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+
+  <div class="auth-container">
+    <h2>{% if page == 'login' %}Entrar{% else %}Criar conta{% endif %}</h2>
+
+    {% if page == 'login' %}
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <label for="username">Usuário</label>
+        <input type="text" name="username" id="username" required>
+
+        <label for="password">Senha</label>
+        <input type="password" name="password" id="password" required>
+
+        <button type="submit">Entrar</button>
+      </form>
+      <div class="switch-link">
+        <p>Não tem conta? <a href="{% url 'signup' %}">Criar conta</a></p>
+      </div>
+
+    {% else %}
+      <form method="post" action="{% url 'signup' %}">
+        {% csrf_token %}
+        
+        <label for="id_username">Usuário</label>
+        {{ form.username }}
+
+        <label for="id_password1">Senha</label>
+        {{ form.password1 }}
+
+        <label for="id_password2">Confirme a senha</label>
+        {{ form.password2 }}
+
+        {% if form.errors %}
+          <div style="color: #f87171; margin-top: 10px;">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <button type="submit">Criar conta</button>
+      </form>
+      <div class="switch-link">
+        <p>Já tem uma conta? <a href="{% url 'login' %}">Entrar</a></p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
