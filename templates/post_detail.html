@@ -36,8 +36,6 @@
     }
 
     .like-button {
-      background-color: #2563eb;
-      color: #f9fafb;
       border: none;
       padding: 10px 16px;
       border-radius: 8px;
@@ -47,8 +45,24 @@
       transition: background-color 0.2s ease;
     }
 
-    .like-button:hover {
+    /* Estado padrão: botão "Curtir" */
+    .like-button.like {
+      background-color: #2563eb;
+      color: #f9fafb;
+    }
+
+    .like-button.like:hover {
       background-color: #1d4ed8;
+    }
+
+    /* Estado alternativo: botão "Descurtir" */
+    .like-button.dislike {
+      background-color: #dc2626;
+      color: #f9fafb;
+    }
+
+    .like-button.dislike:hover {
+      background-color: #b91c1c;
     }
 
     .post-content {
@@ -120,7 +134,7 @@
       </div>
     {% endif %}
 
-    <div class="post-title">{{ post.title }}</div>
+    <div class="post-title">{{ post.title }} {% if qtd_likes > 0 %}| {{qtd_likes}}❤️{% endif %}</div>
     
     <div class="post-meta">
       Por <strong>{{ post.author.username }}</strong> em {{ post.created_at|date:"d/m/Y H:i" }}
@@ -128,7 +142,14 @@
 
     <form method="post" action="#">
       {% csrf_token %}
-      <button class="like-button">❤️ Curtir</button>
+      <button class="like-button {% if user_liked %}dislike{% else %}like{% endif %}">
+        {% if user_liked %}
+          ❤️ Descurtir
+        {% else %}
+          ❤️ Curtir
+        {% endif %}
+      </button>
+      <input type="hidden" name="action" value="like">
     </form>
 
     <div class="post-content">
@@ -139,31 +160,39 @@
       <h3>Comentários</h3>
 
       <!-- Comentários mockados -->
-      <div class="comment">
-        <div class="comment-author">Maria Luíza</div>
-        <div class="comment-content">Achei esse post super útil! Obrigada por compartilhar.</div>
-        <div class="comment-date">20/07/2025 às 14:03</div>
-      </div>
+       {% for comment in comments %}
+        <div class="comment" style="position: relative;">
+          <div class="comment-author">{{ comment.author.username }}</div>
+          <div class="comment-content">{{ comment.content }}</div>
+          <div class="comment-date">{{ comment.created_at|date:"d/m/Y H:i" }}</div>
 
-      <div class="comment">
-        <div class="comment-author">João Pedro</div>
-        <div class="comment-content">Excelente explicação. Já implementei no meu projeto!</div>
-        <div class="comment-date">19/07/2025 às 09:47</div>
-      </div>
-
-      <div class="comment">
-        <div class="comment-author">Ana Costa</div>
-        <div class="comment-content">Ficou alguma dúvida, mas vou reler com calma.</div>
-        <div class="comment-date">18/07/2025 às 21:15</div>
-      </div>
+          {% if request.user == comment.author or request.user == post.author %}
+            <form method="post" action="{% url 'delete_comment' comment.id %}" style="position: absolute; top: 12px; right: 12px;">
+              {% csrf_token %}
+              <button type="submit" title="Deletar comentário" style="
+                background: none;
+                border: none;
+                color: #ef4444;
+                font-size: 1.1rem;
+                cursor: pointer;
+              ">
+                🗑️
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p style="color: #9ca3af;">Nenhum comentário ainda. Seja o primeiro a comentar!</p>
+      {% endfor %}
 
       <!-- Formulário para novo comentário -->
       <form method="post" action="#" style="margin-top: 30px;">
         {% csrf_token %}
+        <input type="hidden" name="action" value="comment">
         <label for="new_comment" style="font-size: 0.9rem; color: #d1d5db; display: block; margin-bottom: 6px;">
           Deixe um comentário
         </label>
-        <textarea id="new_comment" name="comment" rows="3" placeholder="Digite seu comentário..."
+        <textarea id="new_comment" name="new_comment" rows="3" placeholder="Digite seu comentário..."
           style="
             width: 97.5%;
             padding: 10px;

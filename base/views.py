@@ -3,14 +3,19 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from .forms import PostForm
 
-from .models import Post
+from .models import Post, Comment, Like
+from django.db.models import Count
 
 # Create your views here.
 def home(request):
     User = request.user
-    Posts = Post.objects.all().order_by('-created_at')
+    Posts = Post.objects.annotate(
+        num_likes=Count('likes', distinct=True),
+        num_comments=Count('comments', distinct=True)
+    ).order_by('-created_at')
 
     context = {
         'user': User,
@@ -117,7 +122,60 @@ def update_post(request, pk):
 
     return render(request, 'create_post.html', context)
     
-
+@login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    return render(request, 'post_detail.html', {'post': post})
+    comments = Comment.objects.filter(post_id=pk)
+    qtd_likes = Like.objects.filter(post_id=pk).count()
+    user_liked = Like.objects.filter(post_id=pk, user=request.user).exists()
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'comment':
+            content = request.POST.get('new_comment')
+            if content:
+                Comment.objects.create(
+                    author=request.user,
+                    post=post,
+                    content=content
+                )
+                messages.success(request, 'Comentário adicionado com sucesso!')
+            else:
+                messages.error(request, 'O comentário não pode estar vazio.')
+            return redirect('post_detail', pk=pk)
+
+        elif action == 'like':
+            like, created = Like.objects.get_or_create(
+                user=request.user,
+                post=post
+            )
+            if created:
+                messages.success(request, 'Post curtido com sucesso!')         
+            else:
+                like.delete()
+                messages.success(request, 'Curtida removida com sucesso!')
+            return redirect('post_detail', pk=pk)
+
+    context = {
+        'post': post,
+        'comments': comments,
+        'qtd_likes': qtd_likes,
+        'user_liked': user_liked,
+    }
+    return render(request, 'post_detail.html', context)
+
+
+@login_required
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    post_id = comment.post.id
+
+    # Verifica se o usuário é o autor do post ou do comentário
+    if request.user == comment.author or request.user == comment.post.author:
+        comment.delete()
+        messages.success(request, 'Comentário deletado com sucesso.')
+    else:
+        messages.error(request, 'Você não tem permissão para deletar este comentário.')
+
+    return redirect('post_detail', pk=post_id)

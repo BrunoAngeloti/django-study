@@ -189,8 +189,8 @@
             <span>Publicado: {{ post.created_at | date:"d/m/Y" }}</span>
           </div>
           <div class="interactions">
-            <span><span class="icon">❤️</span> 20</span>
-            <span><span class="icon">💬</span> 10</span>
+            <span><span class="icon">❤️</span> {{ post.num_likes }}</span>
+            <span><span class="icon">💬</span> {{ post.num_comments }}</span>
           </div>
         </a>
       </div>
